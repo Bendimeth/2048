@@ -1,0 +1,19 @@
+<div class="container" (keydown)="onKeyDown($event)" tabindex="1">
+  <header class="game-header">
+    <div class="info-field">To play use the arrow keys, game'll indicate where no more moves are possible. In that case refresh the page or use the reset button. Have fun!</div>
+    <button
+      type="button"
+      class="button-reset"
+      (click)="onReset()"
+    >
+      Reset</button>
+  </header>
+  <div class="row mt-3">
+    <div
+      class="col-3"
+      [ngStyle]="{'background-color': '#' + (item + 1001) }"
+      *ngFor="let item of list">
+      {{!item ? '' : item}}
+    </div>
+  </div>
+</div>
