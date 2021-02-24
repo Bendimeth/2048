@@ -1,0 +1,309 @@
+
+@keyframes onElementRender {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes onCellUpdate {
+  from {
+    opacity: .5;
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes onCellMoveTop {
+  from {
+    transform: translateY(60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes onCellMoveRight {
+  from {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes onCellMoveBottom {
+  from {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes onCellMoveLeft {
+  from {
+    transform: translateX(60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes onGameFinished {
+  from {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(720deg) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes onCellCreation {
+  0% {
+    transform: rotate(0deg);
+  }
+  33% {
+    transform: rotate(15deg);
+  }
+  66% {
+    transform: rotate(-15deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes onCellReplace {
+  from {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+@keyframes onCellDestroy {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.container {
+  font-family: "Roboto", sans-serif;
+  padding-top: 5rem;
+  margin: auto;
+  width: 48vh;
+}
+
+.game-header {
+  display: flex;
+}
+
+.info-field {
+  font-size: 14px;
+  padding-right: 1rem;
+  opacity: .5;
+}
+
+.row {
+  margin-bottom: 30px;
+}
+
+.col-3 {
+  color: aliceblue;
+  font-weight: bolder;
+  border: 5px solid white;
+  border-radius: 14px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 10.5vh;
+  height: 12vh;
+  font-size: 24px;
+  padding: 0;
+  margin: 0;
+}
+
+.button-reset {
+  max-height: 4rem;
+  align-self: flex-end;
+  font-family: inherit;
+  border: 3px solid gray;
+  border-radius: .5rem;
+  color: gray;
+  background-color: #1001;
+  padding: .4rem 2rem .4rem 2rem;
+  font-size: 20px;
+  font-weight: 500;
+  box-shadow: 1px 1px 7px lightgray;
+  transition: background-color .2s ease, color .2s ease;
+  &:hover {
+    color: white;
+    background-color: gray;
+  }
+}
+
+.right-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-result {
+  animation: onElementRender .5s ease-out 3s backwards;
+  position: absolute;
+  border-radius: 4px;
+  width: 30%;
+  height: 30%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -80%);
+  background: #fff;
+  z-index: 1;
+  div {
+    margin: .5rem auto;
+  }
+  h1, h3 {
+    text-align: center;
+  }
+  h3 {
+    margin: 2rem 0;
+  }
+  .button-reset {
+    margin: auto auto 2rem auto
+  }
+}
+
+.game-finished-popup {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, .7);
+  animation: onElementRender .5s ease-out 3s backwards;
+}
+
+.cell-updated {
+  position: relative;
+  &::after {
+    position: absolute;
+    border: 5px solid white;
+    border-radius: 14px;
+    content: "";
+    height: 12vh;
+    width: 12vh;
+    background: #ccc;
+    opacity: 0;
+    left: -5px;
+    z-index: -1;
+    animation: onCellUpdate .4s ease-in .3s;
+    top: 0;
+  }
+}
+
+.score-changed {
+  animation: onScoreUpdate .2s ease-out;
+}
+
+.score-result {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-finished {
+  animation: onGameFinished 4s ease;
+  opacity: 0;
+}
+
+.moved-top {
+  animation: onCellMoveTop .3s ease-in;
+  position: relative;
+  &::after {
+    top: -12vh;
+    left: -5px;
+  }
+}
+
+.moved-right {
+  animation: onCellMoveRight .3s ease-in;
+  position: relative;
+  &::after {
+    top: -12vh;
+    left: -5px;
+  }
+}
+
+.moved-bottom {
+  animation: onCellMoveBottom .3s ease-in;
+  position: relative;
+  &::after {
+    top: 12vh;
+    left: -5px;
+  }
+}
+
+.moved-left {
+  animation: onCellMoveLeft .3s ease-in;
+  position: relative;
+  &::after {
+    top: -12vh;
+    left: -5px;
+  }
+}
+
+.moved-top::after, moved-right::after, moved-bottom::after, moved-left::after, cell-updated::after {
+  position: absolute;
+  color: aliceblue;
+  border: 5px solid white;
+  border-radius: 14px;
+  content: "";
+  height: 12vh;
+  width: 12vh;
+  background: black;
+  opacity: 0;
+  animation: onCellReplace .2s ease-out;
+}
+
+.cell-updated::after {
+  top: 0;
+}
+
+.cell-destroyed {
+  opacity: 1;
+  animation: onCellDestroy .3s ease-out;
+  transition: opacity .3s ease-out;
+}
+
+.cell-created {
+  animation: created .8s ease-out;
+}
