@@ -1,11 +1,14 @@
 import {Component, OnInit} from '@angular/core';
-import {StoreService} from "./logic/store.service";
-import {Subscription} from "rxjs";
+import {Subscription} from 'rxjs';
+
+import {GameStatus, IStoreReducer, MoveTo} from './entities/IStoreService';
+
+import {StoreService} from './logic/store.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
 
@@ -13,45 +16,34 @@ export class AppComponent implements OnInit {
   }
 
   subscribe: Subscription;
-  list;
+  stateInstance: IStoreReducer;
 
   ngOnInit(): void {
     this.storeService.initOrResetList();
-    this.list = this.storeService.getList();
+    this.stateInstance = this.storeService.getState();
     this.subscribe = this.storeService.listChanged
       .subscribe(
-        () => {
-          this.list = this.storeService.getList();
+        (state) => {
+          this.stateInstance = state;
         }
       );
   }
 
   onReset(): void {
     this.storeService.initOrResetList();
-    this.list = this.storeService.getList();
   }
 
-  onKeyDown(event) {
-    switch (event.key) {
-      case 'ArrowUp': {
-        this.storeService.onMoveUp();
-      }
-        break;
-      case 'ArrowDown': {
-        this.storeService.onMoveDown();
-      }
-        break;
-      case 'ArrowRight': {
-        this.storeService.onMoveRight();
-      }
-        break;
-      case 'ArrowLeft': {
-        this.storeService.onMoveLeft();
-      }
-        break;
-      default: {
-
-      }
+  onKeyDown(event: KeyboardEvent) {
+    if (this.stateInstance.status !== GameStatus.Finished) {
+        const directionByKeyEvent = {
+          ArrowUp: MoveTo.Top,
+          ArrowDown: MoveTo.Bottom,
+          ArrowRight: MoveTo.Right,
+          ArrowLeft: MoveTo.Left
+        };
+        if (Object.keys(directionByKeyEvent).includes(event.key)) {
+          this.storeService.onMove(directionByKeyEvent[event.key]);
+        }
     }
   }
 }

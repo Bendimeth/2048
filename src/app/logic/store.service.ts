@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Subject} from "rxjs";
-import {MathService} from "../shared/math.service";
+import {Subject} from 'rxjs';
+
+import {GameStatus, IStoreReducer, MoveTo} from '../entities/IStoreService';
+
+import {MathService} from '../shared/math.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,62 +12,63 @@ export class StoreService {
   constructor(private mathService: MathService) {
   }
 
-  listChanged = new Subject<object>();
+  listChanged = new Subject<IStoreReducer>();
 
-  private game = {
-    list: Array(16),
-    status: 'ok'
+  private state: IStoreReducer = {
+    status: GameStatus.InProgress,
+    listValues: [],
+    sessionScore: 0,
+    bestScore: 0
   };
 
   private onUpdate(): void {
-    this.listChanged.next(this.game.list.slice());
+    this.listChanged.next(this.state);
   }
 
-  fillList(): void {
-    this.game.list.fill(0, 0, 16);
-  }
-
-  rollRandom(howMany: number, caller: string): void {
-    const randomNumbers = this.mathService.generateRandomNumbers(howMany, this.game.list);
-
-    if (randomNumbers[0].index === undefined && !this.mathService.isAnyMovePossible(this.game.list)) {
-      return window.alert('game over');
-    } else if (this.game.status === 'stuck' + caller) {
-      return null;
-    }
+  rollRandom(howMany: number): void {
+    const randomNumbers = this.mathService.generateRandomNumbers(howMany, this.state.listValues.map(cell => cell.value));
 
     for (const values of randomNumbers) {
-      this.game.list[values.index] = values.value;
+      this.state.listValues[values.index] = {
+        created: true,
+        value: values.value,
+        destroyed: false
+      };
+    }
+
+    if (this.state.listValues.filter(cell => cell.value === 0)?.length === 0 &&
+      !this.mathService.isAnyMovePossible(this.state.listValues.map(cell => cell.value))) {
+      this.state = {
+        ...this.state,
+        status: GameStatus.Finished
+      };
     }
     this.onUpdate();
   }
 
-  initOrResetList(): void { // bind to new game btn
-    this.fillList();
-    this.rollRandom(2, 'init');
+  initOrResetList(): void {
+    this.state = {
+      listValues: new Array(16).fill(0, 0, 16).map(value => ({
+        value
+      })),
+      bestScore: this.state.sessionScore > this.state.bestScore ? this.state.sessionScore : this.state.bestScore,
+      sessionScore: 0,
+      status: GameStatus.InProgress
+    };
+    this.rollRandom(2);
   }
 
-  onMoveUp(): void {
-    this.game = this.mathService.move(this.game.list.slice(), 'up');
-    this.rollRandom(1, 'up');
+  onMove(direction: MoveTo): void {
+    const result = this.mathService.move(this.state.listValues.slice(), direction);
+    this.state = {
+      ...result,
+      sessionScore: this.state.sessionScore += result.currentMoveScore,
+      bestScore: this.state.bestScore
+    };
+    this.rollRandom(1);
   }
 
-  onMoveDown(): void {
-    this.game = this.mathService.move(this.game.list.slice(), 'down');
-    this.rollRandom(1, 'down');
-  }
-
-  onMoveRight(): void {
-    this.game = this.mathService.move(this.game.list.slice(), 'right');
-    this.rollRandom(1, 'right');
-  }
-
-  onMoveLeft(): void {
-    this.game = this.mathService.move(this.game.list.slice(), 'left');
-    this.rollRandom(1, 'left');
-  }
-
-  getList(): Array<number> {
-    return this.game.list;
+  getState(): IStoreReducer {
+    return this.state;
   }
 }

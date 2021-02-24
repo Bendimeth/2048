@@ -1,19 +1,65 @@
 <div class="container" (keydown)="onKeyDown($event)" tabindex="1">
   <header class="game-header">
-    <div class="info-field">To play use the arrow keys, game'll indicate where no more moves are possible. In that case refresh the page or use the reset button. Have fun!</div>
-    <button
-      type="button"
-      class="button-reset"
-      (click)="onReset()"
-    >
-      Reset</button>
+    <div class="info-field">To play use the arrow keys, game'll indicate where no more moves are possible. In that case
+      refresh the page or use the reset button. Have fun!
+    </div>
+    <div class="right-side">
+      <div>
+        <span>Score: </span>
+        <span>
+          {{stateInstance?.sessionScore}}
+        </span>
+      </div>
+      <button
+        type="button"
+        class="button-reset"
+        (click)="onReset()"
+      >
+        Reset
+      </button>
+    </div>
   </header>
-  <div class="row mt-3">
+  <div
+    class="game-finished-popup"
+    *ngIf="stateInstance.status === 2"
+  >
+    <div class="score-result">
+      <ng-container *ngIf="stateInstance?.sessionScore < stateInstance?.bestScore; else elseBlock">
+        <h3>Game over!</h3>
+        <div>Current score: {{stateInstance.sessionScore}}</div>
+        <div>Best score: {{stateInstance.bestScore}}</div>
+      </ng-container>
+      <ng-template #elseBlock>
+        <h3>New best score!</h3>
+        <h1>{{stateInstance.sessionScore}}</h1>
+      </ng-template>
+      <button
+        type="button"
+        class="button-reset"
+        (click)="onReset()"
+      >
+        Play again
+      </button>
+    </div>
+  </div>
+  <div
+    class="row mt-3"
+    [ngClass]="{'game-finished': stateInstance?.status === 2}"
+  >
     <div
       class="col-3"
-      [ngStyle]="{'background-color': '#' + (item + 1001) }"
-      *ngFor="let item of list">
-      {{!item ? '' : item}}
+      [ngStyle]="{'background-color': '#' + ((item?.value || 0) + 1001) }"
+      [ngClass]="{
+      'moved-top': item?.moved &&  item?.direction === 0,
+      'moved-right': item?.moved && item?.direction === 1,
+      'moved-bottom': item?.moved && item?.direction === 2,
+      'moved-left': item?.moved && item?.direction === 3,
+      'cell-updated': item?.updated,
+      'cell-created': item?.created,
+      'cell-destroyed': item?.destroyed
+      }"
+      *ngFor="let item of stateInstance?.listValues">
+      {{item?.value || ''}}
     </div>
   </div>
 </div>
