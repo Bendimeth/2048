@@ -26,14 +26,15 @@ export class StoreService {
   }
 
   rollRandom(howMany: number): void {
-    const randomNumbers = this.mathService.generateRandomNumbers(howMany, this.state.listValues.map(cell => cell.value));
-
-    for (const values of randomNumbers) {
-      this.state.listValues[values.index] = {
-        created: true,
-        value: values.value,
-        destroyed: false
-      };
+    if (this.state.status === GameStatus.InProgress) {
+      const randomNumbers = this.mathService.generateRandomNumbers(howMany, this.state.listValues.map(cell => cell.value));
+      for (const values of randomNumbers) {
+        this.state.listValues[values.index] = {
+          created: true,
+          value: values.value,
+          destroyed: false
+        };
+      }
     }
 
     if (this.state.listValues.filter(cell => cell.value === 0)?.length === 0 &&
