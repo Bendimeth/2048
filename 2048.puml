@@ -1,0 +1,91 @@
+@startuml
+
+package Enums <<Rectangle>> {
+  enum GameStatus {
+      InProgress
+      Stuck
+      Finished
+  }
+  enum MoveTo {
+    Top
+    Right
+    Bottom
+    Left
+  }
+}
+
+package Interfaces <<Rectangle>> {
+interface IListValues {
+    +updated?: boolean
+    +created?: boolean
+    +moved?: boolean
+    +destroyed?: boolean
+    +direction?: MoveTo
+    +value: number
+}
+interface IStoreReducer {
+    +listValues: IListValues[]
+    +status: GameStatus
+    +sessionScore: number
+    +bestScore: number
+}
+interface IRandomNumber {
+    +value: number
+    +index: number
+}
+interface IMoveAction {
+    +listValues: IListValues[]
+    +status: GameStatus
+    +currentMoveScore: number
+}
+}
+
+Enums <-[hidden]right-> Interfaces
+
+class MathService {
+    +currentMoveScore: number
+    +generateRandomNumbers(quantity: number, array: number[]): IRandomNumber[]
+    +cutVertically(array: IListValues[], col: number): IListValues[]
+    +areArraysTheSame(a: number[], b: number[]): boolean
+    +sortArray(array: IListValues[], direction: MoveTo): IListValues[]
+    +isAnyMovePossible(array: number[]): boolean
+    +matrixTranspositionOnFlatArray(listValues: IListValues[]): IListValues[]
+    +move(array: IListValues[], direction: MoveTo): IMoveAction
+}
+class StoreService {
+    -mathService: MathService
+    +listChanged: Subject<IStoreReducer>
+    -state: IStoreReducer
+    -onUpdate(): void
+    +rollRandom(howMany: number): void
+    +initOrResetList(): void
+    +onMove(direction: MoveTo): void
+    +getState(): IStoreReducer
+}
+class AppComponent {
+    -storeService: StoreService
+    +subscribe: Subscription
+    +stateInstance: IStoreReducer
+    +onReset(): void
+    +onKeyDown(event: KeyboardEvent): void
+}
+
+MathService <-[hidden]down-> Enums
+
+MoveTo ..|> IListValues
+GameStatus ..|> IStoreReducer
+GameStatus ..|> IMoveAction
+IRandomNumber ..|> MathService
+IStoreReducer ..|> StoreService
+IStoreReducer ..|> AppComponent
+IListValues ..|> MathService
+IMoveAction ..|> MathService
+
+note bottom of AppComponent : Handles DOM events,\nsubscribes to store state
+
+note "Communication via high abstraction methods" as N1
+AppComponent *- "1" N1
+N1 - StoreService
+StoreService "1" *-down- MathService
+
+@enduml
