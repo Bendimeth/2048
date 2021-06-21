@@ -28,10 +28,4 @@ describe('AppComponent', () => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toContain('Welcome to simple2048!');
   });
-
-  it('should return calculated value by given currency', fakeAsync(() => {
-    const fixture = TestBed.createComponent(AppComponent); // twój komponent
-    fixture.componentInstance.onReset;
-
-  }))
 });
